@@ -22,9 +22,6 @@ It is highly recommended that you use a [random spoofing ident protocol daemon](
 
 Raw data must be IRC RFC compliant data & any nicks in the MONITOR list will be juped as soon as they become available.
 
-## Todo
-* Built-in ident server
- 
 ## Mirrors
 - [acid.vegas](https://acid.vegas/jupiter) *(main)*
 - [GitHub](https://github.com/acidvegas/jupiter)
