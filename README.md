@@ -10,13 +10,13 @@ The bot is designed to be very minimal, secure, & trustless by nature. This mean
 It is highly recommended that you use a [random spoofing ident protocol daemon](https://github.com/acidvegas/random/blob/master/irc/identd.py)
 
 ## Commands
-| Command              | Description                                                                                       |
-| -------------------- | ------------------------------------------------------------------------------------------------- |
-| id                   | Send bot identity                                                                                 |
-| raw     [-d] <data>  | Send <data> to server, optionally delayed with -d argument                                        |
-| monitor list         | Return MONITOR list                                                                               |
-| monitor reset        | Reset MONITOR list                                                                                |
-| monitor <+/-><nicks> | Add (+) or Remove (-) <nicks> from MONITOR list. *(Can be a single nick or comma seperated list)* |
+| Command                 | Description                                                                                        |
+| ----------------------- | -------------------------------------------------------------------------------------------------- |
+| id                      | Send bot identity                                                                                  |
+| raw     [-d] \<data>    | Send \<data> to server, optionally delayed with -d argument                                        |
+| monitor list            | Return MONITOR list                                                                                |
+| monitor reset           | Reset MONITOR list                                                                                 |
+| monitor \<+/->\<nicks>  | Add (+) or Remove (-) \<nicks> from MONITOR list. *(Can be a single nick or comma seperated list)* |
 
 **Note:** All commands must be prefixed with @all or the bots nick & will work in a channel or private message.
 
