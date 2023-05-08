@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Jupiter IRC Botnet - Developed by acidvegas in Python (https://acid.vegas/jupiter)
+# Jupiter IRC Botnet - Developed by acidvegas in Python (https://git.acid.vegas/jupiter)
 
 import random
 import re
@@ -10,19 +10,19 @@ import threading
 
 # Connection
 servers = (
-	'efnet.deic.eu',         # IPv6
-	'efnet.port80.se',       # IPv6
-	'efnet.portlane.se',     # IPv6
-	'irc.choopa.net',        # IPv6
-	'irc.colosolutions.net',
-	'irc.du.se',
-	'irc.efnet.fr',          # IPv6
-	'irc.efnet.nl',          # IPv6 +6669
-	'irc.homelien.no',       # IPv6
+	'efnet.deic.eu',         # IPv6 +6697
+	'efnet.port80.se',       # IPv6 +6697
+	'efnet.portlane.se',     # IPv6 +6697
+	'irc.choopa.net',        # IPv6 +9000
+	'irc.colosolutions.net', # +6697 (SSL handshake failed: unsafe legacy renegotiation disabled) (0day incomming)
+	'irc.du.se',             # +6697 (SSL handshake failed: dh key too small)
+	'irc.efnet.fr',          # IPv6 +6697
+	'irc.efnet.nl',          # IPv6 +6697
+	'irc.homelien.no',       # IPv6 +6697
 	'irc.mzima.net',         # IPv6 +6697
-	'irc.nordunet.se',       # IPv6
+	'irc.nordunet.se',       # IPv6 +6697
 	'irc.prison.net',
-	'irc.underworld.no',     # IPv6
+	'irc.underworld.no',     # IPv6 +6697
 	'irc.servercentral.net'  # +9999
 )
 ipv6    = False

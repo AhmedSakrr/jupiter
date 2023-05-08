@@ -1,7 +1,6 @@
 # Jupiter
 > internet relay chat botnet for efnet
 
-
 ## Information
 Jupiter will create a botnet by connecting a defined number of clones to every EFNet server. A single host could potentially create over 30 clones. It is meant to monitor/jupe/hold nicks & be controlled to do just about anything.
 
@@ -23,6 +22,7 @@ It is highly recommended that you use a [random spoofing ident protocol daemon](
 Raw data must be IRC RFC compliant data & any nicks in the MONITOR list will be juped as soon as they become available.
 
 ## Mirrors
-- [acid.vegas](https://acid.vegas/jupiter) *(main)*
+- [acid.vegas](https://git.acid.vegas/jupiter)
 - [GitHub](https://github.com/acidvegas/jupiter)
 - [GitLab](https://gitlab.com/acidvegas/jupiter)
+- [SuperNETs](https://git.supernets.org/acidvegas/jupiter)
