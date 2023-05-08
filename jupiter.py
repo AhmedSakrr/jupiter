@@ -9,24 +9,24 @@ import time
 import threading
 
 # Connection
-servers = (
-	'efnet.deic.eu',         # IPv6 +6697
-	'efnet.port80.se',       # IPv6 +6697
-	'efnet.portlane.se',     # IPv6 +6697
-	'irc.choopa.net',        # IPv6 +9000
-	'irc.colosolutions.net', # +6697 (SSL handshake failed: unsafe legacy renegotiation disabled) (0day incomming)
-	'irc.du.se',             # +6697 (SSL handshake failed: dh key too small)
-	'irc.efnet.fr',          # IPv6 +6697
-	'irc.efnet.nl',          # IPv6 +6697
-	'irc.homelien.no',       # IPv6 +6697
-	'irc.mzima.net',         # IPv6 +6697
-	'irc.nordunet.se',       # IPv6 +6697
-	'irc.prison.net',
-	'irc.underworld.no',     # IPv6 +6697
-	'irc.servercentral.net'  # +9999
-)
-ipv6    = False
-vhosts  = None # Use (line.rstrip() for line in open('vhosts.txt','r').readlines() if line) for reading from a file.
+servers = {
+	{'server':'efnet.deic.eu',         'ssl':6697},
+	{'server':'efnet.port80.se',       'ssl':6697},
+	{'server':'efnet.portlane.se',     'ssl':6697},
+	{'server':'irc.choopa.net',        'ssl':9000},
+	{'server':'irc.colosolutions.net', 'ssl':None}, # No IPv6 or SSL (error: SSL handshake failed: unsafe legacy renegotiation disabled)
+	{'server':'irc.du.se',             'ssl':None}, # No IPv6 or SSL (error: handshake failed: dh key too small)
+	{'server':'irc.efnet.fr',          'ssl':6697},
+	{'server':'irc.efnet.nl',          'ssl':6697},
+	{'server':'irc.homelien.no',       'ssl':6697},
+	{'server':'irc.mzima.net',         'ssl':6697},
+	{'server':'irc.nordunet.se',       'ssl':6697},
+	{'server':'irc.prison.net',        'ssl':None}, # No IPv6
+	{'server':'irc.underworld.no',     'ssl':6697},
+	{'server':'irc.servercentral.net', 'ssl':9999}  # No IPv6
+}
+ipv6    = False # Set to True to attempt IPv6 connections for more clones
+#vhosts  = None  # Use (line.rstrip() for line in open('vhosts.txt','r').readlines() if line) for reading from a file.
 channel = '#jupiter'
 key     = None
 
@@ -82,12 +82,14 @@ def random_nick():
 	return prefix+midfix+suffix
 
 class clone(threading.Thread):
-	def __init__(self, server, vhost):
-		self.monlist  = list()
-		self.nickname = random_nick()
-		self.server   = server
-		self.sock     = None
-		self.vhost    = vhost
+	def __init__(self, server, addr_type):
+		self.monlist    = list()
+		self.nickname   = random_nick()
+		self.server     = server
+		self.addr_type  = addr_type
+		self.port       = 6667
+		self.sock       = None
+		self.ssl_status = None
 		threading.Thread.__init__(self)
 
 	def run(self):
@@ -97,21 +99,30 @@ class clone(threading.Thread):
 	def connect(self):
 		try:
 			self.create_socket()
-			self.sock.connect((server, 6667))
+			self.sock.connect((self.server['server'], self.port))
 			self.raw(f'USER {random_nick()} 0 * :{random_nick()}')
 			self.nick(self.nickname)
 		except socket.error as ex:
 			error('Failed to connect to IRC server.', ex)
 			self.event_disconnect()
+		except ssl.SSLError as ex:
+			error('Failed to connect to IRC server using SSL/TLS.', ex)
+			self.ssl_status = False
+			self.event_disconnect()
 		else:
 			self.listen()
 
 	def create_socket(self):
-		ipv6_check = set([ip[4][0] for ip in socket.getaddrinfo(server,6667) if ':' in ip[4][0]])
-		self.sock  = socket.socket(socket.AF_INET6) if ipv6 and ipv6_check else socket.socket()
-		if self.vhost:
-			self.sock.bind((self.vhost,0))
-		#self.sock = ssl.wrap_socket(self.sock) # pre-define ssl ports>
+		self.sock = socket.socket(self.addr_type)
+		#if self.vhost:
+		#	self.sock.bind((self.vhost,0))
+		if self.server['ssl']:
+			if self.ssl_status:
+				self.port = self.server['ssl']
+				self.sock = ssl.wrap_socket(self.sock)
+			else:
+				self.port = 6667
+				self.ssl_status = True
 
 	def event_connect(self):
 		if self.nickname not in bots:
@@ -123,6 +134,7 @@ class clone(threading.Thread):
 	def event_ctcp(self, nick, target, msg):
 		if target == self.nickname:
 			self.sendmsg(channel, '[{0}] {1}{2}{3} {4}'.format(color('CTCP', green), color('<', grey), color(nick, yellow), color('>', grey), msg))
+			# Todo: send CTCP replies to avoid suspicion
 
 	def event_disconnect(self):
 		if self.nickname in bots:
@@ -276,13 +288,10 @@ class clone(threading.Thread):
 		self.raw(f'PRIVMSG {target} :{msg}')
 
 # Main
-if type(vhosts) == list:
-	for vhost in vhosts:
-		for i in range(concurrency):
-			for server in servers:
-				clone(server, vhost).start()
-else:
-	for i in range(concurrency):
-		for server in servers:
-			clone(server, vhosts).start()
+for i in range(concurrency):
+	for server in servers:
+		clone(server, socket.AF_INET).start()
+		if ipv6:
+			if set([ip[4][0] for ip in socket.getaddrinfo(self.server['server'],6667) if ':' in ip[4][0]]):
+				clone(server, socket.AF_INET6).start()
 while True:input('')

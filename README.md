@@ -2,7 +2,9 @@
 > internet relay chat botnet for efnet
 
 ## Information
-Jupiter will create a botnet by connecting a defined number of clones to every EFNet server. A single host could potentially create over 30 clones. It is meant to monitor/jupe/hold nicks & be controlled to do just about anything.
+Jupiter will create a botnet by connecting a defined number of clones to every EFNet server. A single host could potentially create over 80 clones without suspicion. It is meant to monitor/jupe/hold nicks & be controlled to do just about anything.
+
+For example, at the time of writing this, there are 14 active EFNet servers. With 3 clones per-server on IPv4 connections, plus another 3 clones per-server on IPv6 connections, thats 6 clones per-server, equating to 84 total clones...all from a single machine. Run this bot on multiple machines, you get the point.
 
 The bot is designed to be very minimal, secure, & trustless by nature. This means anyone can run a copy of your script on their server to help build your botnet.
 
@@ -11,6 +13,7 @@ It is highly recommended that you use a [random spoofing ident protocol daemon](
 ## Commands
 | Command                 | Description                                                                                        |
 | ----------------------- | -------------------------------------------------------------------------------------------------- |
+| 5000 \<chan>            | Emulates SuperNETs #5000 channel *(Joins \<chan> and will PM bomb anyone who joins the channel)*   |
 | id                      | Send bot identity                                                                                  |
 | raw     [-d] \<data>    | Send \<data> to server, optionally delayed with -d argument                                        |
 | monitor list            | Return MONITOR list                                                                                |
