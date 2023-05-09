@@ -88,6 +88,7 @@ class clone(threading.Thread):
 		self.server     = server
 		self.addr_type  = addr_type
 		self.port       = 6667
+		self.relay      = None
 		self.sock       = None
 		self.ssl_status = None
 		threading.Thread.__init__(self)
@@ -162,6 +163,9 @@ class clone(threading.Thread):
 			self.sendmsg(channel, '[{0}] {1}{2}{3} {4}'.format(color('NOTICE', purple), color('<', grey), color(nick, yellow), color('>', grey), msg))
 
 	def event_message(self, ident, nick, target, msg):
+		if target == self.relay:
+			# Todo: throttle relayed messages to avoid flooding out
+			self.sendmsg(channel, '[{0}] <{1}>: {2}'.format(color(target, cyan), color(nick[:15].ljust(15), purple), msg))
 		if is_admin(ident):
 			args = msg.split()
 			if args[0] in ('@all',self.nickname) and len(args) >= 2:
@@ -188,6 +192,9 @@ class clone(threading.Thread):
 							for mon_nick in nicks:
 								self.monlist.remove(mon_nick)
 							self.sendmsg(target, '{0} nick(s) have been {1} from the monitor list.'.format(color(str(len(nicks)), cyan), color('removed', red)))
+				elif len(args) >= 3 and args[1] == 'relay' and target == self.nick:
+					chan = args[2]
+					self.relay = None if chan == 'stop' else chan
 				elif len(args) >= 4 and args[1] == 'raw':
 					if args[2] == '-d':
 						data = ' '.join(args[3:])
@@ -195,6 +202,7 @@ class clone(threading.Thread):
 					else:
 						data = ' '.join(args[2:])
 						self.raw(data)
+
 		elif target == self.nickname:
 			if msg.startswith('\x01ACTION'):
 				self.sendmsg(channel, '[{0}] {1}{2}{3} * {4}'.format(color('PM', red), color('<', grey), color(nick, yellow), color('>', grey), msg[8:][:-1]))
