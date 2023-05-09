@@ -27,7 +27,6 @@ servers = (
 	{'server':'irc.servercentral.net', 'ssl':9999}  # No IPv6
 )
 ipv6     = True # Set to False if your system does not have an IPv6 address
-#vhosts  = None  # Use (line.rstrip() for line in open('vhosts.txt','r').readlines() if line) for reading from a file.
 channel  = '#jupiter'
 key      = None
 
@@ -123,8 +122,6 @@ class clone(threading.Thread):
 
 	def create_socket(self):
 		self.sock = socket.socket(self.addr_type)
-		#if self.vhost:
-		#	self.sock.bind((self.vhost,0))
 		if self.server['ssl']:
 			if self.ssl_status:
 				self.port = self.server['ssl']
@@ -237,7 +234,7 @@ class clone(threading.Thread):
 				self.sendmsg(channel, '[{0}] {1}{2}{3} {4}'.format(color('PM', red), color('<', grey), color(nick, yellow), color('>', grey), msg))
 
 	def event_mode(self, nick, chan, modes):
-		# Todo: takeover landmine mode to automatically jupe a channel upon +o
+		# Todo: takeover mode to automatically jupe a channel upon +o
 		pass
 
 	def event_quit(self, nick):
