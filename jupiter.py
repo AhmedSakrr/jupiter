@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Jupiter IRC Botnet - Developed by acidvegas in Python (https://git.acid.vegas/jupiter)
 
 import random
@@ -81,12 +82,19 @@ def random_nick():
 	suffix = random.choice(['ed','est','er','le','ly','y','ies','iest','ian','ion','est','ing','led']+list('abcdfgklmnprstvwz'))
 	return prefix+midfix+suffix
 
+def unicode():
+	msg=''
+	for i in range(random.randint(150, 200)):
+		msg += chr(random.randint(0x1000,0x3000))
+	return msg
+
 class clone(threading.Thread):
 	def __init__(self, server, addr_type):
+		self.5000       = None
+		self.addr_type  = addr_type
 		self.monlist    = list()
 		self.nickname   = random_nick()
 		self.server     = server
-		self.addr_type  = addr_type
 		self.port       = 6667
 		self.relay      = None
 		self.sock       = None
@@ -144,6 +152,12 @@ class clone(threading.Thread):
 		time.sleep(86400+random.randint(1800,3600))
 		self.connect()
 
+	def event_join(self, nick, chan)
+		if chan == self.5000:
+			self.sendmsg(chan, f'{unicode()} oh god {nick} what is happening {unicode()}')
+			self.sendmsg(nick, f'{unicode()} oh god {nick} what is happening {unicode()}')
+
+
 	def event_nick(self, nick, new_nick):
 		if nick == self.nickname:
 			self.nickname = new_nick
@@ -172,29 +186,33 @@ class clone(threading.Thread):
 				if len(args) == 2:
 					if args[1] == 'id':
 						self.sendmsg(target, id)
-				elif len(args) == 3 and args[1] == 'monitor':
-					if args[2] == 'list' and self.monlist:
-						self.sendmsg(target, '[{0}] {1}'.format(color('Monitor', light_blue), ', '.join(self.monlist)))
-					elif args[2] == 'reset' and self.monlist:
-						self.monitor('C')
-						self.monlist = list()
-						self.sendmsg(target, '{0} nick(s) have been {1} from the monitor list.'.format(color(str(len(self.monlist)), cyan), color('removed', red)))
-					elif args[2][:1] == '+':
-						nicks = [mon_nick for mon_nick in set(args[2][1:].split(',')) if mon_nick not in self.monlist]
-						if nicks:
-							self.monitor('+', nicks)
-							self.monlist += nicks
-							self.sendmsg(target, '{0} nick(s) have been {1} to the monitor list.'.format(color(str(len(nicks)), cyan), color('added', green)))
-					elif args[2][:1] == '-':
-						nicks = [mon_nick for mon_nick in set(args[2][1:].split(',')) if mon_nick in self.monlist]
-						if nicks:
-							self.monitor('-', nicks)
-							for mon_nick in nicks:
-								self.monlist.remove(mon_nick)
-							self.sendmsg(target, '{0} nick(s) have been {1} from the monitor list.'.format(color(str(len(nicks)), cyan), color('removed', red)))
-				elif len(args) >= 3 and args[1] == 'relay' and target == self.nick:
-					chan = args[2]
-					self.relay = None if chan == 'stop' else chan
+				elif len(args) == 3:
+					if args[1] == '5000':
+						chan = args[2]
+						self.5000 = None if chan == 'stop' else chan
+					elif args[1] == 'monitor':
+						if args[2] == 'list' and self.monlist:
+							self.sendmsg(target, '[{0}] {1}'.format(color('Monitor', light_blue), ', '.join(self.monlist)))
+						elif args[2] == 'reset' and self.monlist:
+							self.monitor('C')
+							self.monlist = list()
+							self.sendmsg(target, '{0} nick(s) have been {1} from the monitor list.'.format(color(str(len(self.monlist)), cyan), color('removed', red)))
+						elif args[2][:1] == '+':
+							nicks = [mon_nick for mon_nick in set(args[2][1:].split(',')) if mon_nick not in self.monlist]
+							if nicks:
+									self.monitor('+', nicks)
+								self.monlist += nicks
+								self.sendmsg(target, '{0} nick(s) have been {1} to the monitor list.'.format(color(str(len(nicks)), cyan), color('added', green)))
+						elif args[2][:1] == '-':
+							nicks = [mon_nick for mon_nick in set(args[2][1:].split(',')) if mon_nick in self.monlist]
+							if nicks:
+								self.monitor('-', nicks)
+								for mon_nick in nicks:
+									self.monlist.remove(mon_nick)
+								self.sendmsg(target, '{0} nick(s) have been {1} from the monitor list.'.format(color(str(len(nicks)), cyan), color('removed', red)))
+					elif args[1] == 'relay' and target == self.nick:
+						chan = args[2]
+						self.relay = None if chan == 'stop' else chan
 				elif len(args) >= 4 and args[1] == 'raw':
 					if args[2] == '-d':
 						data = ' '.join(args[3:])
@@ -210,7 +228,8 @@ class clone(threading.Thread):
 				self.sendmsg(channel, '[{0}] {1}{2}{3} {4}'.format(color('PM', red), color('<', grey), color(nick, yellow), color('>', grey), msg))
 
 	def event_mode(self, nick, chan, modes):
-		pass # Don't know what we are doing with this yet.
+		# Todo: takeover landmine mode to automatically jupe a channel upon +o
+		pass
 
 	def event_quit(self, nick):
 		if nick in self.monlist:
@@ -233,6 +252,10 @@ class clone(threading.Thread):
 		elif args[1] == '731' and len(args) >= 4: # RPL_MONOFFLINE
 			nick = args[3][1:]
 			self.nick(nick)
+		elif args[1] == 'JOIN' and len(args) == 3:
+			nick = args[0].split('!')[0][1:]
+			chan = args[2][1:]
+			self.event_join(nick, chan)
 		elif args[1] == 'MODE' and len(args) >= 4:
 			nick  = args[0].split('!')[0][1:]
 			chan  = args[2]
