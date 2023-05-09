@@ -306,7 +306,7 @@ class clone(threading.Thread):
 			except (UnicodeDecodeError,UnicodeEncodeError):
 				pass
 			except Exception as ex:
-				error('Unexpected error occured.', ex)
+				error('Unexpected error occured on \'{0}\' server.'.format(self.server['server']), ex)
 				break
 		self.event_disconnect()
 
