@@ -157,7 +157,6 @@ class clone(threading.Thread):
 			self.sendmsg(chan, f'{unicode()} oh god {nick} what is happening {unicode()}')
 			self.sendmsg(nick, f'{unicode()} oh god {nick} what is happening {unicode()}')
 
-
 	def event_nick(self, nick, new_nick):
 		if nick == self.nickname:
 			self.nickname = new_nick
