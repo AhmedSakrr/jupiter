@@ -26,7 +26,7 @@ servers = (
 	{'server':'irc.underworld.no',     'ssl':6697},
 	{'server':'irc.servercentral.net', 'ssl':9999}  # No IPv6
 )
-ipv6     = False # Set to True to attempt IPv6 connections for more clones
+ipv6     = True # Set to False if your system does not have an IPv6 address
 #vhosts  = None  # Use (line.rstrip() for line in open('vhosts.txt','r').readlines() if line) for reading from a file.
 channel  = '#jupiter'
 key      = None
@@ -332,6 +332,6 @@ for i in range(concurrency):
 	for server in servers:
 		clone(server, socket.AF_INET).start()
 		if ipv6:
-			if set([ip[4][0] for ip in socket.getaddrinfo(self.server['server'],6667) if ':' in ip[4][0]]):
+			if set([ip[4][0] for ip in socket.getaddrinfo(server['server'],6667) if ':' in ip[4][0]]):
 				clone(server, socket.AF_INET6).start()
 while True:input('')
