@@ -10,7 +10,7 @@ import time
 import threading
 
 # Connection
-servers = {
+servers = (
 	{'server':'efnet.deic.eu',         'ssl':6697},
 	{'server':'efnet.port80.se',       'ssl':6697},
 	{'server':'efnet.portlane.se',     'ssl':6697},
@@ -25,11 +25,11 @@ servers = {
 	{'server':'irc.prison.net',        'ssl':None}, # No IPv6
 	{'server':'irc.underworld.no',     'ssl':6697},
 	{'server':'irc.servercentral.net', 'ssl':9999}  # No IPv6
-}
-ipv6    = False # Set to True to attempt IPv6 connections for more clones
+)
+ipv6     = False # Set to True to attempt IPv6 connections for more clones
 #vhosts  = None  # Use (line.rstrip() for line in open('vhosts.txt','r').readlines() if line) for reading from a file.
-channel = '#jupiter'
-key     = None
+channel  = '#jupiter'
+key      = None
 
 # Settings
 admin           = 'nick!user@host' # Can use wildcards (Must be in nick!user@host format)
@@ -90,8 +90,8 @@ def unicode():
 
 class clone(threading.Thread):
 	def __init__(self, server, addr_type):
-		self.5000       = None
 		self.addr_type  = addr_type
+		self.landmine   = None
 		self.monlist    = list()
 		self.nickname   = random_nick()
 		self.server     = server
@@ -102,7 +102,7 @@ class clone(threading.Thread):
 		threading.Thread.__init__(self)
 
 	def run(self):
-		time.sleep(random.randint(300,900))
+		#time.sleep(random.randint(300,900))
 		self.connect()
 
 	def connect(self):
@@ -112,10 +112,10 @@ class clone(threading.Thread):
 			self.raw(f'USER {random_nick()} 0 * :{random_nick()}')
 			self.nick(self.nickname)
 		except socket.error as ex:
-			error('Failed to connect to IRC server.', ex)
+			error('Failed to connect to \'{0}\' IRC server.'.format(self.server['server']), ex)
 			self.event_disconnect()
 		except ssl.SSLError as ex:
-			error('Failed to connect to IRC server using SSL/TLS.', ex)
+			error('Failed to connect to \'{0}\' IRC server using SSL/TLS.'.format(self.server['server']), ex)
 			self.ssl_status = False
 			self.event_disconnect()
 		else:
@@ -152,8 +152,8 @@ class clone(threading.Thread):
 		time.sleep(86400+random.randint(1800,3600))
 		self.connect()
 
-	def event_join(self, nick, chan)
-		if chan == self.5000:
+	def event_join(self, nick, chan):
+		if chan == self.landmine:
 			self.sendmsg(chan, f'{unicode()} oh god {nick} what is happening {unicode()}')
 			self.sendmsg(nick, f'{unicode()} oh god {nick} what is happening {unicode()}')
 
@@ -188,7 +188,12 @@ class clone(threading.Thread):
 				elif len(args) == 3:
 					if args[1] == '5000':
 						chan = args[2]
-						self.5000 = None if chan == 'stop' else chan
+						if chan == 'stop':
+							self.landmine = None
+							self.sendmsg(channel, '5000 mode turned off')
+						elif chan[:1] == '#':
+							self.landmine = chan
+							self.sendmsg(channel, '5000 mode actived on ' + color(chan, cyan))
 					elif args[1] == 'monitor':
 						if args[2] == 'list' and self.monlist:
 							self.sendmsg(target, '[{0}] {1}'.format(color('Monitor', light_blue), ', '.join(self.monlist)))
@@ -199,7 +204,7 @@ class clone(threading.Thread):
 						elif args[2][:1] == '+':
 							nicks = [mon_nick for mon_nick in set(args[2][1:].split(',')) if mon_nick not in self.monlist]
 							if nicks:
-									self.monitor('+', nicks)
+								self.monitor('+', nicks)
 								self.monlist += nicks
 								self.sendmsg(target, '{0} nick(s) have been {1} to the monitor list.'.format(color(str(len(nicks)), cyan), color('added', green)))
 						elif args[2][:1] == '-':
@@ -209,9 +214,14 @@ class clone(threading.Thread):
 								for mon_nick in nicks:
 									self.monlist.remove(mon_nick)
 								self.sendmsg(target, '{0} nick(s) have been {1} from the monitor list.'.format(color(str(len(nicks)), cyan), color('removed', red)))
-					elif args[1] == 'relay' and target == self.nick:
+					elif args[1] == 'relay' and args[0] == self.nickname:
 						chan = args[2]
-						self.relay = None if chan == 'stop' else chan
+						if chan == 'stop':
+							self.relay = None
+							self.sendmsg(channel, 'Relay turned off')
+						elif chan[:1] == '#':
+							self.relay = chan
+							self.sendmsg(channel, 'Monitoring ' + color(chan, cyan))
 				elif len(args) >= 4 and args[1] == 'raw':
 					if args[2] == '-d':
 						data = ' '.join(args[3:])
@@ -291,7 +301,7 @@ class clone(threading.Thread):
 			try:
 				data = self.sock.recv(1024).decode('utf-8')
 				for line in (line for line in data.split('\r\n') if len(line.split()) >= 2):
-					debug(line)
+					#debug(line)
 					self.handle_events(line)
 			except (UnicodeDecodeError,UnicodeEncodeError):
 				pass
