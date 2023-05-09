@@ -102,7 +102,7 @@ class clone(threading.Thread):
 		threading.Thread.__init__(self)
 
 	def run(self):
-		#time.sleep(random.randint(300,900))
+		time.sleep(random.randint(300,900))
 		self.connect()
 
 	def connect(self):
