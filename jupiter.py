@@ -201,7 +201,7 @@ class clone(threading.Thread):
 				if len(args) == 2:
 					if args[1] == 'id':
 						self.sendmsg(target, id)
-					elif args[1] == 'sync'
+					elif args[1] == 'sync':
 						time.sleep(random.randint(10,30))
 						self.raw('WHO ' + channel)
 				elif len(args) == 3:
