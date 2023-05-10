@@ -28,7 +28,7 @@ servers = (
 )
 ipv6     = True # Set to False if your system does not have an IPv6 address
 channel  = '#jupiter'
-backup   = '#jupiter-' + str(random.randint(1000,9999) # Use /list -re #jupiter-* on weechat to find your bots
+backup   = '#jupiter-' + str(random.randint(1000,9999)) # Use /list -re #jupiter-* on weechat to find your bots
 key      = None
 
 # Settings
@@ -53,7 +53,7 @@ grey        = '14'
 
 # Used for fake-conversation mode
 random_messages = (
-	'hey','hi','hello','sup','wussup','hai','hie','wuddup','wuzzup yall','sup everyone','hey guys','greetings','ne chats','good morning',
+	'h','hey','hi','hello','sup','wussup','hai','hie','wuddup','wuzzup yall','sup everyone','hey guys','greetings','ne chats','good morning',
 	'whos here','anyone here','bored','b0red','nm u','thx','cool','sick','np','wow','ok','nice','XD',':)','XD','love irc','i like this channel',
 	'some of you guys are alright','whats going on','https://youtube.com/video/2456348754','uhhh','fuck','whats good','someone help me','where is mikejonez?',
 	'irc will never be the same','tbh','i know','same','i cant even believe what i just read','do you guys like android or iphone','anyone want to share emails',
@@ -150,7 +150,7 @@ class clone(threading.Thread):
 		if target == self.nickname:
 			if msg != 'VERSION':
 				self.sendmsg(channel, '[{0}] {1}{2}{3} {4}'.format(color('CTCP', green), color('<', grey), color(nick, yellow), color('>', grey), msg))
-			else;
+			else:
 				pass # Todo: send CTCP replies to avoid suspicion
 
 	def event_disconnect(self):
@@ -164,7 +164,7 @@ class clone(threading.Thread):
 			self.sendmsg(nick, f'{unicode()} oh god {nick} what is happening {unicode()}')
 		elif chan == channel:
 			self.botcontrol('+', nick)
-		elif chan == backup:
+		elif chan == backup and key:
 			self.mode(chan, '+k ' + key)
 		# Todo: check if we are the first in the channel to set modes
 
@@ -276,7 +276,7 @@ class clone(threading.Thread):
 					elif current in self.bots and item == 'o' and state == '-':
 						reopp.append(current)
 						if len(reopp) == 4:
-							self.mode(chan, '+o)
+							self.mode(chan, '+o')
 			if op and nick not in self.bots:
 				_bots = self.bots
 				random.shuffle(_bots)
