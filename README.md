@@ -6,7 +6,7 @@ Jupiter will create a botnet by connecting a defined number of clones to every E
 
 For example, at the time of writing this, there are 14 active EFNet servers. With 3 clones per-server on IPv4 connections, plus another 3 clones per-server on IPv6 connections, thats 6 clones per-server, equating to 84 total clones...all from a single machine. Run this bot on multiple machines, you get the point.
 
-Any server with SSL/TLS ports opened, will be connected using SSL/TLS. If using SSL/TLS to connect fails, it will fall back to a standard connection on port 6667 and will try an SSL/TLS again next time. When IPv6 is enabled, Servers with IPv6 support will be connected to with both IPv4 & IPv6 clones. Juping is handling using [MONITOR](https://ircv3.net/specs/extensions/monitor) & by watching for nick changes or quits.
+Any server with SSL/TLS ports opened, will be connected using SSL/TLS. If using SSL/TLS to connect fails, it will fall back to a standard connection on port 6667 and will try an SSL/TLS again next time. When IPv6 is enabled, Servers with IPv6 support will be connected to with both IPv4 & IPv6 clones. Juping is handled using [MONITOR](https://ircv3.net/specs/extensions/monitor) to watch for nick changes or quits. The bots will also join a backup channel in-case the main channel gets killed & you need to find your bots. The backup channel is suffixed with random numbers & can be searched for from doing /LIST.
 
 The bot is designed to be very minimal, secure, & trustless by nature. This means anyone can run a copy of your script on their server to help build your botnet.
 
@@ -23,6 +23,7 @@ It is highly recommended that you use a [random spoofing ident protocol daemon](
 | monitor list            | Return MONITOR list                                                                                       |
 | monitor reset           | Reset MONITOR list                                                                                        |
 | monitor \<+/->\<nicks>  | Add (+) or Remove (-) \<nicks> from MONITOR list. *(Can be a single nick or comma seperated list)*        |
+| sync                    | Sync the bot list *(Handled automatically but good practice to sync occasionally)*                        |
 
 **Note:** All commands must be prefixed with @all or the bots nick & will work in a channel or private message.
 
@@ -30,10 +31,11 @@ Raw data must be IRC RFC compliant data & any nicks in the MONITOR list will be 
 
 ## Todo
 - CTCP replies *(Randomized but persistent on a per-bot basis)*
+- Ability to set multiple admins on the fly / changing hub channel on the fly
 - Built in identd server with randomized spoofing responses
-- Fake conversation mode in the bot channel to look legit incase network operators come sniffing around
-- Takeover features to automatitically jupe a channel when you get +o
-- Protection features *(Automatically +o other bots, remove bans on bots, set many +eI modes, etc)*
+- Fake conversation mode to look legit incase network operators come sniffing around
+- Bot pack protection features *(Auto-op other bots, remove bans on bots, set +eI exemptions on bot hosts, kickban those trying to stop the bots)*
+- Takeover attack features *(Let the battle of +oooo -oooo commence)*
 
 ## Mirrors
 - [acid.vegas](https://git.acid.vegas/jupiter)
