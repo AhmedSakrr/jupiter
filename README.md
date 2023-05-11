@@ -15,17 +15,17 @@ The bot is designed to be very minimal, secure, & trustless by nature. This mean
 It is highly recommended that you use a [random spoofing ident protocol daemon](https://github.com/acidvegas/random/blob/master/irc/identd.py)
 
 ## Commands
-| Command                 | Description                                                                                               |
-| ----------------------- | --------------------------------------------------------------------------------------------------------- |
-| 5000 \<chan>            | Emulates SuperNETs #5000 channel *(Joins \<chan> and will PM bomb anyone who joins the channel)*          |
-| id                      | Send bot identity                                                                                         |
-| raw [-d] \<data>        | Send \<data> to server, optionally delayed with -d argument                                               |
-| relay \<chan>           | Relay all data from \<chan> into the bot channel *(Can not use @all & must join channel via `raw` first)* |
-| relay stop              | Stop the relay *(Will not turn off from kicks, etc)*                                                      |
-| monitor list            | Return MONITOR list                                                                                       |
-| monitor reset           | Reset MONITOR list                                                                                        |
-| monitor \<+/->\<nicks>  | Add (+) or Remove (-) \<nicks> from MONITOR list. *(Can be a single nick or comma seperated list)*        |
-| sync                    | Sync the bot list *(Handled automatically but good practice to sync occasionally)*                        |
+| Command                | Description                                                                                                |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `5000 <chan>`          | Emulates SuperNETs #5000 channel *(Join #5000 on irc.supernets.org for help using this command)*           |
+| `id`                   | Send bot identity                                                                                          |
+| `raw [-d] <data>`      | Send `<data>` to server, optionally delayed with -d argument                                               |
+| `relay <chan>`         | Relay all data from `<chan>` into the bot channel *(Can not use @all & must join channel via `raw` first)* |
+| `relay stop`           | Stop the relay *(Will not turn off from kicks, etc)*                                                       |
+| `monitor list`         | Return MONITOR list                                                                                        |
+| `monitor reset`        | Reset MONITOR list                                                                                         |
+| `monitor <+/-><nicks>` | Add (+) or Remove (-) `<nicks>` from MONITOR list. *(Can be a single nick or comma seperated list)*        |
+| `sync`                 | Sync the bot list *(Handled automatically but good practice to sync occasionally)*                         |
 
 **Note:** All commands must be prefixed with @all or the bots nick & will work in a channel or private message.
 
@@ -33,7 +33,7 @@ Raw data must be IRC RFC compliant data & any nicks in the MONITOR list will be 
 
 ## Todo
 - CTCP replies *(Randomized but persistent on a per-bot basis)*
-- Ability to set admin/channel on the fly
+- Ability to set admin/channel on the fly *(requested by delorean)*
 - Built in identd server with randomized spoofing responses
 - Improved protections *(Remove bans placed on bots, retaliate on KICK & +b)*
 - Invite clones to +i channels
