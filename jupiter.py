@@ -29,11 +29,11 @@ servers = (
 ipv6     = True # Set to False if your system does not have an IPv6 address
 channel  = '#jupiter'
 backup   = '#jupiter-' + str(random.randint(1000,9999)) # Use /list -re #jupiter-* on weechat to find your bots
-key      = None
+key      = 'xChangeMex'
 
 # Settings
 admin           = 'nick!user@host' # Can use wildcards (Must be in nick!user@host format)
-concurrency     = 3                # Number of clones to load per server
+concurrency     = 5                # Number of clones to load per server
 id              = 'TEST'           # Unique ID so you can tell which bots belong what server
 
 # Formatting Control Characters / Color Codes
@@ -60,6 +60,17 @@ random_messages = (
 	'i really like this irc network','i hate college','ahh','x_x','another day','irc is serious','no chats','dead chats','anyone watch sports?','haha','yeah',
 	'no','nah','yo','shutup','you guys are retarded','these chats suck','what the niggaballs','wtf','what the fuck','okay','LOL','lol','lmao','lmfao','rofl','hehe'
 )
+
+bots = list()
+
+def botcontrol(action, data):
+	global bots
+	if action == '+':
+		if data not in bots:
+			bots.append(data)
+	elif action == '-':
+		if data in bots:
+			bots.remove(data)
 
 def color(msg, foreground, background=None):
 	return f'\x03{foreground},{background}{msg}{reset}' if background else f'\x03{foreground}{msg}{reset}'
@@ -91,7 +102,6 @@ def unicode():
 class clone(threading.Thread):
 	def __init__(self, server, addr_type):
 		self.addr_type  = addr_type
-		self.bots       = list()
 		self.landmine   = None
 		self.monlist    = list()
 		self.nickname   = random_nick()
@@ -99,20 +109,12 @@ class clone(threading.Thread):
 		self.port       = 6667
 		self.relay      = None
 		self.sock       = None
-		self.ssl_status = None
+		self.ssl_status = True
 		threading.Thread.__init__(self)
 
 	def run(self):
 		time.sleep(random.randint(300,900))
 		self.connect()
-
-	def botcontrol(self, action, data):
-		if action == '+':
-			if data not in self.bots:
-				self.bots.append(data)
-		elif action == '-':
-			if data in self.bots:
-				self.bots.remove(data)
 
 	def connect(self):
 		try:
@@ -144,14 +146,14 @@ class clone(threading.Thread):
 		if self.monlist:
 			self.monitor('+', self.monlist)
 		self.join_channel(channel, key)
-		self.join_channel(backup)
+		self.join_channel(backup,  key)
 
 	def event_ctcp(self, nick, target, msg):
 		if target == self.nickname:
-			if msg != 'VERSION':
-				self.sendmsg(channel, '[{0}] {1}{2}{3} {4}'.format(color('CTCP', green), color('<', grey), color(nick, yellow), color('>', grey), msg))
-			else:
+			if msg == 'VERSION':
 				pass # Todo: send CTCP replies to avoid suspicion
+			else:
+				self.sendmsg(channel, '[{0}] {1}{2}{3} {4}'.format(color('CTCP', green), color('<', grey), color(nick, yellow), color('>', grey), msg))
 
 	def event_disconnect(self):
 		self.sock.close()
@@ -163,24 +165,21 @@ class clone(threading.Thread):
 			self.sendmsg(chan, f'{unicode()} oh god {nick} what is happening {unicode()}')
 			self.sendmsg(nick, f'{unicode()} oh god {nick} what is happening {unicode()}')
 		elif chan == channel:
-			self.botcontrol('+', nick)
-		elif chan == backup and key:
-			self.mode(chan, '+k ' + key)
-		# Todo: check if we are the first in the channel to set modes
+			botcontrol('+', nick)
 
 	def event_nick(self, nick, new_nick):
 		if nick == self.nickname:
-			self.botcontrol('-', nick)
-			self.botcontrol('+', new_nick)
+			botcontrol('-', nick)
+			botcontrol('+', new_nick)
 			self.nickname = new_nick
 			if self.nickname in self.monlist:
 				self.monitor('C')
 				self.monlist = list()
 		elif nick in self.monlist:
 			self.nick(nick)
-		elif nick in self.bots:
-			self.botcontrol('-', nick)
-			self.botcontrol('+', new_nick)
+		elif nick in bots:
+			botcontrol('-', nick)
+			botcontrol('+', new_nick)
 
 	def event_nick_in_use(self, nick, target_nick):
 		if nick == '*':
@@ -201,8 +200,7 @@ class clone(threading.Thread):
 				if len(args) == 2:
 					if args[1] == 'id':
 						self.sendmsg(target, id)
-					elif args[1] == 'sync':
-						time.sleep(random.randint(10,30))
+					elif args[1] == 'sync' and args[0] == self.nickname:
 						self.raw('WHO ' + channel)
 				elif len(args) == 3:
 					if args[1] == '5000':
@@ -255,50 +253,47 @@ class clone(threading.Thread):
 				self.sendmsg(channel, '[{0}] {1}{2}{3} {4}'.format(color('PM', red), color('<', grey), color(nick, yellow), color('>', grey), msg))
 
 	def event_mode(self, nick, chan, modes):
-		# This is a VERY dirty way to trigger receiving +o
-		# Currently, the bots loop trying to +o each other because efnet allows you to +o someone who already has +o
-		# Will improve on this later...
-		nicks = modes.split()[1:]
-		modes = modes.split()[0]
-		if 'o' in modes:
-			state = None
-			op = False
-			for item in modes:
-				if item in ('+-'):
-					state = item
-				else:
-					current = nicks.pop(0)
-					if current == self.nickname and item == 'o':
-						if state == '+':
-							op = True
-						else:
-							op = False
-					elif current in self.bots and item == 'o' and state == '-':
-						reopp.append(current)
-						if len(reopp) == 4:
-							self.mode(chan, '+o')
-			if op and nick not in self.bots:
-				_bots = self.bots
-				random.shuffle(_bots)
-				opped = []
-				for bot in _bots:
-					opped.append(bot)
-					if len(opped) == 4:
-						self.mode(chan, '+oooo ' + ' '.join(opped))
-						opped = []
-						self.sendmsg(chan, f'{unicode()} oh god what is happening {unicode()}')
-		#self.mode(chan, '+eeee ')                     # Set +b exemption on bots
-		#self.mode(chan, '+IIII ')                     # Set +I exemption on bots
-		#self.mode(chan, '+imk ' + random.randint(1000,9999)
-		#self.raw('KICK {chan} {nick} {unicode()}')    # Kick everyone using unifuck as the kick reason
-		#self.mode(chan, '+bbbb ')                     # Ban every user
-		#self.mode(chan, '+bbb *!*@* *!*@*.* *!*@*:*') # Ban everyone
+		if chan == backup and modes == '+nt' and key
+			self.mode(backup, '+mk' + key)
+		else:
+			nicks = modes.split()[1:]
+			modes = modes.split()[0]
+			if 'o' in modes:
+				state = None
+				op = False
+				lostop = list()
+				for item in modes:
+					if item in ('+-'):
+						state = item
+					else:
+						if nicks:
+							current = nicks.pop(0)
+							if current == self.nickname and item == 'o':
+								op = True if state == '+' else False
+							elif current in bots and item == 'o' and state == '-':
+								lostop.append(current)
+				if op and nick not in bots:
+					_bots = bots
+					random.shuffle(_bots)
+					_bots = [_bots[i:i+4] for i in range(0, len(_bots), 4)]
+					for clones in _bots:
+						self.mode(chan, '+oooo ' + ' '.join(clones))
+				elif lostop:
+					self.raw(f'KICK {chan} {nick} {unicode()}')
+					self.mode(chan, '+' + 'o'*len(lostop) + ' ' + ' '.join(lostop))
+					self.sendmsg(chan, f'{unicode()} oh god what is happening {unicode()}')
+			#self.mode(chan, '+eeee ')                     # Set +b exemption on bots
+			#self.mode(chan, '+IIII ')                     # Set +I exemption on bots
+			#self.mode(chan, '+imk ' + random.randint(1000,9999)
+			#self.raw('KICK {chan} {nick} {unicode()}')    # Kick everyone using unifuck as the kick reason
+			#self.mode(chan, '+bbbb ')                     # Ban every user
+			#self.mode(chan, '+bbb *!*@* *!*@*.* *!*@*:*') # Ban everyone
 
 	def event_quit(self, nick):
 		if nick in self.monlist:
 			self.nick(nick)
-		elif nick in self.bots:
-			self.botcontrol('-', nick)
+		elif nick in bots:
+			botcontrol('-', nick)
 
 	def handle_events(self, data):
 		args = data.split()
@@ -311,17 +306,15 @@ class clone(threading.Thread):
 		elif args[1] == '001': # RPL_WELCOME
 			self.event_connect()
 		elif args[1] == '315': # RPL_ENDOFWHO
-			#self.sendmsg(channel, 'Sync complete')
-			pass
+			self.sendmsg(channel, 'Sync complete')
 		elif args[1] == '353' and len(args) >= 4: # RPL_WHOREPLY
-			nick = args[4]
+			nick = args[2]
 			if nick[:1] == '~':
 				nick = nick[1:]
-			self.botcontrol('+',nick)
+			botcontrol('+',nick)
 		elif args[1] == '366' and len(args) >= 4: # RPL_ENDOFNAMES
 			chan = args[3]
-			if chan == channel:
-				self.raw('WHO ' + channel)
+			#Todo: confirm chan join here
 		elif args[1] == '433' and len(args) >= 4: # ERR_NICKNAMEINUSE
 			nick = args[2]
 			target_nick = args[3]
