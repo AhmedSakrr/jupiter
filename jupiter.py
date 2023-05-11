@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Jupiter IRC Botnet - Developed by acidvegas in Python (https://git.acid.vegas/jupiter)
+# jupiter: internet relay chat botnet for efnet - developed by acidvegas in python (https://git.acid.vegas/jupiter)
 
 import random
 import re

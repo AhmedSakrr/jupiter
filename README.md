@@ -35,8 +35,10 @@ Raw data must be IRC RFC compliant data & any nicks in the MONITOR list will be 
 - CTCP replies *(Randomized but persistent on a per-bot basis)*
 - Ability to set admin/channel on the fly
 - Built in identd server with randomized spoofing responses
-- Remove bans placed on bots
+- Improved protections *(Remove bans placed on bots, retaliate on KICK & +b)*
+- Invite clones to +i channels
 - Takeover attack features
+- Possibly use only one connection per-server & create clones on `multiple` command / destroy clones on `destroy` command. *(No point in having clones when we arent doing anything with them)*
 
 ## Mirrors
 - [acid.vegas](https://git.acid.vegas/jupiter)
