@@ -279,8 +279,9 @@ class clone(threading.Thread):
 					for clones in _bots:
 						self.mode(chan, '+oooo ' + ' '.join(clones))
 				elif lostop:
-					self.raw(f'KICK {chan} {nick} {unicode()}')
 					self.mode(chan, '+' + 'o'*len(lostop) + ' ' + ' '.join(lostop))
+					self.raw(f'KICK {chan} {nick} {unicode()}')
+					self.mode(chan, f'+b {nick}!*@*')
 					self.sendmsg(chan, f'{unicode()} oh god what is happening {unicode()}')
 			#self.mode(chan, '+eeee ')                     # Set +b exemption on bots
 			#self.mode(chan, '+IIII ')                     # Set +I exemption on bots
