@@ -1,6 +1,8 @@
 # Jupiter
 > internet relay chat botnet for efnet
 
+*"let the battle of the +oooo -oooo commence"*
+
 ## Information
 Jupiter will create a botnet by connecting a defined number of clones to every EFNet server. A single host could potentially create close to 100 clones without any suspicion. It is meant to monitor/jupe/hold nicks & be controlled to do just about anything.
 
@@ -31,11 +33,10 @@ Raw data must be IRC RFC compliant data & any nicks in the MONITOR list will be 
 
 ## Todo
 - CTCP replies *(Randomized but persistent on a per-bot basis)*
-- Ability to set multiple admins on the fly / changing hub channel on the fly
+- Ability to set admin/channel on the fly
 - Built in identd server with randomized spoofing responses
-- Fake conversation mode to look legit incase network operators come sniffing around
-- Bot pack protection features *(Auto-op other bots, remove bans on bots, set +eI exemptions on bot hosts, kickban those trying to stop the bots)*
-- Takeover attack features *(Let the battle of +oooo -oooo commence)*
+- Remove bans placed on bots
+- Takeover attack features
 
 ## Mirrors
 - [acid.vegas](https://git.acid.vegas/jupiter)

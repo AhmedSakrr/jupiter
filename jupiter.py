@@ -249,6 +249,9 @@ class clone(threading.Thread):
 	def event_mode(self, nick, chan, modes):
 		if chan == backup and modes == '+nt' and key
 			self.mode(backup, '+mk' + key)
+		elif ('e' in modes or 'I' in modes) and self.host in modes:
+			if nick not in bots:
+				self.mode(chan, f'+eI *!*@{self.host} *!*@{self.host}') # Quick and dirty +eI recovery
 		else:
 			nicks = modes.split()[1:]
 			modes = modes.split()[0]
