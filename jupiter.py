@@ -385,7 +385,7 @@ class clone(threading.Thread):
 	def raw(self, data, delay=False):
 		if delay:
 			time.sleep(random.randint(300,900))
-		self.sock.send(bytes(data + '\r\n', 'utf-8'))
+		self.sock.send(bytes(data[:510] + '\r\n', 'utf-8'))
 
 	def sendmsg(self, target, msg):
 		self.raw(f'PRIVMSG {target} :{msg}')
