@@ -51,16 +51,7 @@ light_blue  = '12'
 pink        = '13'
 grey        = '14'
 
-# Used for fake-conversation mode
-random_messages = (
-	'h','hey','hi','hello','sup','wussup','hai','hie','wuddup','wuzzup yall','sup everyone','hey guys','greetings','ne chats','good morning',
-	'whos here','anyone here','bored','b0red','nm u','thx','cool','sick','np','wow','ok','nice','XD',':)','XD','love irc','i like this channel',
-	'some of you guys are alright','whats going on','https://youtube.com/video/2456348754','uhhh','fuck','whats good','someone help me','where is mikejonez?',
-	'irc will never be the same','tbh','i know','same','i cant even believe what i just read','do you guys like android or iphone','anyone want to share emails',
-	'i really like this irc network','i hate college','ahh','x_x','another day','irc is serious','no chats','dead chats','anyone watch sports?','haha','yeah',
-	'no','nah','yo','shutup','you guys are retarded','these chats suck','what the niggaballs','wtf','what the fuck','okay','LOL','lol','lmao','lmfao','rofl','hehe'
-)
-
+# Globals
 bots = list()
 
 def botcontrol(action, data):
@@ -105,6 +96,7 @@ class clone(threading.Thread):
 		self.landmine   = None
 		self.monlist    = list()
 		self.nickname   = random_nick()
+		self.host       = self.nickname + '!*@*'
 		self.server     = server
 		self.port       = 6667
 		self.relay      = None
@@ -160,12 +152,14 @@ class clone(threading.Thread):
 		time.sleep(86400+random.randint(1800,3600))
 		self.connect()
 
-	def event_join(self, nick, chan):
+	def event_join(self, nick, host, chan):
 		if chan == self.landmine:
 			self.sendmsg(chan, f'{unicode()} oh god {nick} what is happening {unicode()}')
 			self.sendmsg(nick, f'{unicode()} oh god {nick} what is happening {unicode()}')
 		elif chan == channel:
 			botcontrol('+', nick)
+			if nick == self.nickname:
+				self.host = host
 
 	def event_nick(self, nick, new_nick):
 		if nick == self.nickname:
@@ -272,12 +266,15 @@ class clone(threading.Thread):
 								op = True if state == '+' else False
 							elif current in bots and item == 'o' and state == '-':
 								lostop.append(current)
-				if op and nick not in bots:
-					_bots = bots
-					random.shuffle(_bots)
-					_bots = [_bots[i:i+4] for i in range(0, len(_bots), 4)]
-					for clones in _bots:
-						self.mode(chan, '+oooo ' + ' '.join(clones))
+				if op:
+					if nick not in bots:
+						_bots = bots
+						random.shuffle(_bots)
+						_bots = [_bots[i:i+4] for i in range(0, len(_bots), 4)]
+						for clones in _bots:
+							self.mode(chan, '+oooo ' + ' '.join(clones))
+					self.mode(chan, f'+eI *!*@{self.host} *!*@{self.host}')
+					self.mode(chan, f'+eI {unicode()[:10]}!{unicode()[:10]}@{unicode()[:10]} {unicode()[:10]}!{unicode()[:10]}@{unicode()[:10]}')
 				elif lostop:
 					self.mode(chan, '+' + 'o'*len(lostop) + ' ' + ' '.join(lostop))
 					self.raw(f'KICK {chan} {nick} {unicode()}')
@@ -325,8 +322,9 @@ class clone(threading.Thread):
 			self.nick(nick)
 		elif args[1] == 'JOIN' and len(args) == 3:
 			nick = args[0].split('!')[0][1:]
+			host = args[0].split('@')[1]
 			chan = args[2][1:]
-			self.event_join(nick, chan)
+			self.event_join(nick, host, chan)
 		elif args[1] == 'MODE' and len(args) >= 4:
 			nick  = args[0].split('!')[0][1:]
 			chan  = args[2]
