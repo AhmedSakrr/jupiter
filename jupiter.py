@@ -85,7 +85,7 @@ def random_nick():
 	return prefix+midfix+suffix
 
 def unicode():
-	msg=f'\x03{random.randint(2,14)}'
+	msg='\u202e\x03' + str(random.randint(2,14)
 	for i in range(random.randint(150, 200)):
 		msg += chr(random.randint(0x1000,0x3000))
 	return msg
